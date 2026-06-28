@@ -15,13 +15,13 @@ export const loginUser = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user._id, email: user.email },
+            { id: user._id, email: user.email, role: user.role }, 
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
         res.json({
-            user: { id: user._id, name: user.name, email: user.email },
+            user: { id: user._id, name: user.name, email: user.email, role: user.role },
             token
         });
     } catch (error) {
@@ -32,7 +32,7 @@ export const loginUser = async (req, res) => {
 // Obtener todos los usuarios (read) - PROTEGIDA
 export const getUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password'); // Oculta las contraseñas al listarlos
+        const users = await User.find().select('-password'); 
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener usuarios', error });
@@ -41,14 +41,15 @@ export const getUsers = async (req, res) => {
 
 // Crear un nuevo usuario (create/register) - PÚBLICA
 export const createUser = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     try {
-        const newUser = new User({ name, email, password });
+        const newUser = new User({ name, email, password, role }); 
         await newUser.save();
         res.status(201).json({
             id: newUser._id,
             name: newUser.name,
-            email: newUser.email
+            email: newUser.email,
+            role: newUser.role
         });
     } catch (error) {
         res.status(400).json({ message: 'Error al crear usuario', error });
